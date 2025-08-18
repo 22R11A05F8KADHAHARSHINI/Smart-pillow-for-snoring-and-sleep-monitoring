@@ -1,0 +1,66 @@
+#include <ESP32Servo.h>
+
+Servo motor1;
+Servo motor2;
+
+const int led = 2;           // LED pin
+const int s = 34;            // Sensor pin (Analog input)
+const int threshold = 2640;  // Threshold value for snoring sound detection
+const int waitTime = 5000;   // Wait time in milliseconds (5 seconds)
+
+// Flag to track if the motors have been moved
+bool motorsMoved = false;
+
+void setup() {
+  // Start serial communication for debugging
+  Serial.begin(9600);  
+  motor1.attach(23);         // Attach the first motor to pin 23
+  motor2.attach(22);         // Attach the second motor to pin 22
+  pinMode(led, OUTPUT);      // Set LED pin as output c 
+  pinMode(s, INPUT);         // Set sensor pin as input
+}
+
+void loop() {
+  // Read the sensor value
+  int ss = analogRead(s);
+  
+  // Print the sensor value to Serial Monitor for debugging
+  Serial.println(ss);
+
+  // Check if the sensor value exceeds the threshold (snoring detected)
+  if (ss >= threshold && !motorsMoved) {
+    digitalWrite(led, HIGH);   // Turn LED ON
+    
+    // First servo motor rotates to 90 degrees, then back to 0
+    motor1.write(45);          
+    Serial.println("Motor 1 moved to 45 degrees.");
+    delay(1000);               // Wait for 1 second
+    motor1.write(0);           
+    Serial.println("Motor 1 returned to 0 degrees.");
+    delay(1000);               // Wait for 1 second
+    
+    // Second servo motor rotates to 90 degrees, then back to 0
+    motor2.write(45);          
+    Serial.println("Motor 2 moved to 45 degrees.");
+    delay(1000);               // Wait for 1 second
+    motor2.write(0);           
+    Serial.println("Motor 2 returned to 0 degrees.");
+    delay(1000);               // Wait for 1 second
+
+    // After both motors move, set the flag to indicate motors have been moved
+    motorsMoved = true;        
+  } 
+  else if (ss < threshold && motorsMoved) {
+    digitalWrite(led, LOW);    // Turn LED OFF
+    
+    // Ensure both motors are at their original positions when snoring stops
+    motor1.write(0);
+    motor2.write(0);
+
+    Serial.println("Snoring ended! Both motors returned to 0 degrees.");
+    
+    motorsMoved = false;       // Reset the flag
+  }
+  
+  delay(100);  // Small delay to avoid excessive processing
+}
