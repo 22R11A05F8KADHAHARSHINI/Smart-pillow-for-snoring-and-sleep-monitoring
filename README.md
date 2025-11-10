@@ -13,4 +13,4 @@ The pillow uses **sensors and IoT technology** to detect snoring and gently wake
 ## 🧰 Tech Stack
 - **IoT Sensors** (sound/vibration detection)
 - **Microcontroller** (Arduino/ESP32 or similar)
-- **Actuator/Motor** (for pillow adjustment or vibration)
+
